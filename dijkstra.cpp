@@ -11,21 +11,37 @@ void addEdge(node** graph, int n1, int n2, int weight) {
   graph[n1]->_adjacency_list.push_back(std::make_pair(n2, weight));
 }
 
+struct vertex {
+  int _index, _distance;
+
+  vertex() {
+  }
+
+  vertex(int index, int distance) {
+    _index = index;
+    _distance = distance;
+  }
+};
+
+bool operator<(vertex v1, vertex v2) {
+  return v1._distance > v2._distance;
+}
+
 void dijkstra(node** graph, int n, int root, int* distances) {
-  for(int i = 0; i < n; ++i) {
+  for (int i = 0; i < n; ++i) {
     distances[i] = INT_MAX;
   }
-  std::priority_queue< std::pair<int, int> > q;
-  q.push(std::make_pair(root, 0));
   distances[root] = 0;
+  std::priority_queue<vertex> q;
+  q.push(vertex(root, 0));
   while(!q.empty()) {
-    int front = q.top().first;
+    int front = q.top()._index;
     q.pop();
     for(std::list< std::pair<int, int> >::iterator it = graph[front]->_adjacency_list.begin();
-          it != graph[front]->_adjacency_list.end(); ++it) {
+        it != graph[front]->_adjacency_list.end(); ++it) {
       if(distances[it->first] > distances[front] + it->second) {
-        q.push(*it);
         distances[it->first] = distances[front] + it->second;
+        q.push(vertex(it->first, distances[it->first]));
       }
     }
   }
